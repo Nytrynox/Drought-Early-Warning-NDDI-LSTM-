@@ -44,3 +44,23 @@ https://www.kaggle.com/datasets/datasetengineer/crop-health-and-environmental-st
 - This app assumes a time column and NDVI/NDWI or NDDI columns. You can map columns in the GUI.
 - For probabilistic forecasts, MC Dropout is used at inference.
 # Drought-Early-Warning-NDDI-LSTM-
+
+## Deployment
+
+This is a Python Streamlit app. Hosts that serve static sites (like Netlify or Vercel’s static mode) will show 404/NOT_FOUND because there’s no static build output. Use a Python-friendly host:
+
+- Streamlit Community Cloud: connect repo and set "app.py" as the entry file.
+- Render: repo deploy using the provided `render.yaml`.
+- Hugging Face Spaces: choose Space type "Streamlit" and point to `app.py`.
+- Railway/Heroku: use the provided `Procfile` and `runtime.txt`.
+
+### Render (recommended)
+Render will detect `render.yaml` and create a Web Service automatically.
+
+If creating manually:
+- Build Command: `pip install --upgrade pip && pip install -r requirements.txt`
+- Start Command: `streamlit run app.py --server.port=$PORT --server.address=0.0.0.0`
+- Environment: Python 3.11 (set `PYTHON_VERSION=3.11` if needed)
+
+### Why Vercel/Netlify 404?
+They expect either a static site build or a Node/Edge serverless entrypoint. Streamlit is a stateful Python server and doesn’t produce a static build, so you’ll see `404: NOT_FOUND`. Deploy to one of the Python hosts above.

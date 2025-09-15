@@ -1,0 +1,11 @@
+streamlit>=1.37.0
+pandas>=2.2.2
+numpy>=1.26.4
+plotly>=5.22.0
+scikit-learn>=1.4.2
+torch>=2.4.1
+requests>=2.32.3
+pydantic>=2.8.2
+python-dateutil>=2.9.0.post0
+kaggle>=1.6.17
+pyyaml>=6.0.2

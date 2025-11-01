@@ -1,6 +1,6 @@
 [server]
 headless = true
 enableCORS = false
-address = "0.0.0.0"
-; Let hosting platform choose the port; overriding can break on Streamlit Cloud
-; port = 8501
+enableXsrfProtection = false
+address = "localhost"
+port = 8501

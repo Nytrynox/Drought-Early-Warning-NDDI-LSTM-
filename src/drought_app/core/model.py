@@ -66,6 +66,13 @@ def build_lstm_model(input_steps: int, units: int = 32, dropout: float = 0.2):
 def train_model(model, X_train, y_train, X_val, y_val, batch_size=32, epochs=20):
     device = torch.device("mps" if torch.backends.mps.is_available() else ("cuda" if torch.cuda.is_available() else "cpu"))
     model.to(device)
+    
+    # Convert to float32 for MPS compatibility (Apple Silicon)
+    X_train = X_train.astype(np.float32)
+    y_train = y_train.astype(np.float32)
+    X_val = X_val.astype(np.float32)
+    y_val = y_val.astype(np.float32)
+    
     train_ds = TensorDataset(torch.from_numpy(X_train), torch.from_numpy(y_train).unsqueeze(-1))
     val_ds = TensorDataset(torch.from_numpy(X_val), torch.from_numpy(y_val).unsqueeze(-1))
     train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=False)
@@ -112,6 +119,8 @@ def train_model(model, X_train, y_train, X_val, y_val, batch_size=32, epochs=20)
 
 def mc_dropout_predict(model, X, mc_samples: int = 50):
     device = next(model.parameters()).device
+    # Convert to float32 for MPS compatibility
+    X = X.astype(np.float32)
     x = torch.from_numpy(X).to(device)
     preds = []
     model.train()  # enable dropout

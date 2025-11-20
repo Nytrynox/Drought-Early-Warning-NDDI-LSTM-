@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.venv*/
+.env
+.env.*
+
+# Streamlit
+.streamlit/secrets.toml
+
+# Data and cache
+.cache/
+.data/
+models/
+artifacts/
+
+# OS
+.DS_Store
+
+# Editor/IDE
+.vscode/
+.idea/
+
+# Tests and coverage
+.pytest_cache/
+.coverage*
+coverage/
+htmlcov/
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Jupyter
+.ipynb_checkpoints/

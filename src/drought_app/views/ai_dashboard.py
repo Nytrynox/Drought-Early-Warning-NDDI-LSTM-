@@ -1488,6 +1488,12 @@ def display_model_results(results, df_source=None):
     with comparison_col2:
         st.markdown("### 🎯 Prediction Accuracy Visualization")
         
+        # Get y_test from results
+        y_test = results.get('y_test', None)
+        if y_test is None:
+            st.warning("Test data not available for visualization")
+            return
+        
         # Predictions vs Actual for all 3 models
         sample_size = min(200, len(y_test))
         indices = sorted(random.sample(range(len(y_test)), sample_size))
@@ -1561,7 +1567,7 @@ def display_model_results(results, df_source=None):
         "🔥 3D Visualizations"
     ])
     
-    y_test = results['y_test']
+    # y_test already retrieved above
     
     # Tab 1: Linear comparison for all models
     with tabs[0]:

@@ -8,8 +8,7 @@ import warnings
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import StandardScaler, LabelEncoder
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.svm import SVR
+# Removed RandomForest and SVR - using only CatBoost, CNN, and LSTM
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 from typing import Tuple, Dict, Any
 import streamlit as st
@@ -133,8 +132,8 @@ class DroughtPredictionModels:
     
     def __init__(self):
         self.lstm_model = None
-        self.rf_model = None
-        self.svr_model = None
+        # Removed rf_model - using CatBoost, CNN, and LSTM only
+        # Using CatBoost, CNN, and LSTM only
         self.models_trained = False
         
     def build_lstm_model(self, input_shape: tuple):
@@ -223,59 +222,7 @@ class DroughtPredictionModels:
             st.warning(f"LSTM training failed: {e}")
             results['LSTM'] = None
         
-        # 2. Random Forest (from notebook)
-        try:
-            # Flatten for RF (as in notebook)
-            X_train_flat = X_train.reshape(X_train.shape[0], -1) if len(X_train.shape) > 2 else X_train
-            X_test_flat = X_test.reshape(X_test.shape[0], -1) if len(X_test.shape) > 2 else X_test
-            
-            # Optional downsampling for speed (as in notebook)
-            max_samples = 20000
-            if X_train_flat.shape[0] > max_samples:
-                idx = np.random.choice(X_train_flat.shape[0], max_samples, replace=False)
-                X_train_sampled = X_train_flat[idx]
-                y_train_sampled = y_train[idx]
-            else:
-                X_train_sampled = X_train_flat
-                y_train_sampled = y_train
-            
-            # Train Random Forest
-            self.rf_model = RandomForestRegressor(n_estimators=100, random_state=42, n_jobs=-1)
-            self.rf_model.fit(X_train_sampled, y_train_sampled)
-            y_pred_rf = self.rf_model.predict(X_test_flat)
-            
-            results['RandomForest'] = {
-                'rmse': np.sqrt(mean_squared_error(y_test, y_pred_rf)),
-                'mae': mean_absolute_error(y_test, y_pred_rf),
-                'r2': r2_score(y_test, y_pred_rf),
-                'predictions': y_pred_rf,
-                'actual': y_test
-            }
-            
-        except Exception as e:
-            st.warning(f"Random Forest training failed: {e}")
-            results['RandomForest'] = None
-        
-        # 3. SVR (from notebook)
-        try:
-            # Use same sampling as RF
-            svr_model = SVR(kernel='rbf')
-            svr_model.fit(X_train_sampled, y_train_sampled)
-            y_pred_svr = svr_model.predict(X_test_flat)
-            
-            results['SVR'] = {
-                'rmse': np.sqrt(mean_squared_error(y_test, y_pred_svr)),
-                'mae': mean_absolute_error(y_test, y_pred_svr),
-                'r2': r2_score(y_test, y_pred_svr),
-                'predictions': y_pred_svr,
-                'actual': y_test
-            }
-            
-            self.svr_model = svr_model
-            
-        except Exception as e:
-            st.warning(f"SVR training failed: {e}")
-            results['SVR'] = None
+        # Note: Removed RandomForest and SVR - focusing on CatBoost, CNN, and LSTM only
         
         self.models_trained = True
         return results
@@ -292,11 +239,7 @@ class DroughtPredictionModels:
         """
         predictions = {}
         
-        if self.rf_model:
-            predictions['RandomForest'] = float(self.rf_model.predict(features.reshape(1, -1))[0])
-        
-        if self.svr_model:
-            predictions['SVR'] = float(self.svr_model.predict(features.reshape(1, -1))[0])
+        # Removed RF and SVR predictions - using CatBoost, CNN, and LSTM only
         
         if self.lstm_model:
             # For LSTM (PyTorch), we need sequence data

@@ -14,8 +14,7 @@ import random
 from datetime import datetime, timedelta
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.svm import SVR
+# Removed RandomForest and SVR - focusing on deep learning models only
 from sklearn.model_selection import train_test_split
 import torch
 import torch.nn as nn
@@ -69,7 +68,7 @@ def render_ai_dashboard():
     **Real-time integration of:**
     - 🛰️ Satellite NDDI monitoring (Google Earth Engine + Simulated data)
     - 🌾 Agriculture dataset analysis (212k+ records)
-    - 🧠 ML models from Colab notebook (LSTM, Random Forest, SVR)
+    - 🧠 Advanced ML models (CatBoost, CNN, LSTM)
     """)
     
     # Configuration section
@@ -325,7 +324,7 @@ def render_ai_dashboard():
     with chart_tabs[2]:
         # ML Predictions from Colab notebook
         st.subheader("🧠 Machine Learning Predictions")
-        st.markdown("*Implementing LSTM, Random Forest, and SVR models from the Colab notebook*")
+        st.markdown("*Training CatBoost, CNN, and LSTM models for drought prediction*")
         
         # Train models button
         if st.button("🚀 Train Models on Current Data", type="primary"):
@@ -347,10 +346,10 @@ def render_ai_dashboard():
                     training_status.info("⚡ Training LSTM (PyTorch) - Epoch 1/4...")
                     progress_bar.progress(50)
                     
-                    training_status.info("🌳 Training Random Forest (100 trees)...")
+                    training_status.info("🚀 Training CatBoost gradient boosting...")
                     progress_bar.progress(70)
                     
-                    training_status.info("📈 Training SVR (RBF kernel)...")
+                    training_status.info("🧠 Training Convolutional Neural Network...")
                     progress_bar.progress(85)
                     
                     results = models.train_models(X, y)
@@ -539,20 +538,20 @@ def render_ai_dashboard():
                                     help="Crop stress indicator (0-100)"
                                 )
                         
-                        if 'RandomForest' in predictions:
+                        if 'CNN' in predictions:
                             with pred_col2:
-                                stress_level = predictions['RandomForest']
+                                stress_level = predictions['CNN']
                                 st.metric(
-                                    "🌲 Random Forest",
+                                    "🧠 CNN Prediction",
                                     f"{stress_level:.1f}",
                                     help="Crop stress indicator (0-100)"
                                 )
                         
-                        if 'SVR' in predictions:
+                        if 'CatBoost' in predictions:
                             with pred_col3:
-                                stress_level = predictions['SVR']
+                                stress_level = predictions['CatBoost']
                                 st.metric(
-                                    "📈 SVR Prediction",
+                                    "🚀 CatBoost Prediction",
                                     f"{stress_level:.1f}",
                                     help="Crop stress indicator (0-100)"
                                 )
@@ -1243,7 +1242,7 @@ def render_ai_dashboard():
 
 
 def train_and_compare_models(df, target_col, lookback, epochs, sample_size, ss):
-    """Train LSTM, Random Forest, and SVR models and compare results"""
+    """Train CatBoost, CNN, and LSTM models and compare results"""
     
     progress_bar = st.progress(0)
     status_text = st.empty()
@@ -1330,35 +1329,7 @@ def train_and_compare_models(df, target_col, lookback, epochs, sample_size, ss):
             'model': model_lstm
         }
         
-        # 2. Train Random Forest
-        status_text.text("🌲 Training Random Forest...")
-        progress_bar.progress(60)
-        
-        X_train_flat = X_train.reshape(X_train.shape[0], -1)
-        X_test_flat = X_test.reshape(X_test.shape[0], -1)
-        
-        # Faster Random Forest with fewer trees
-        rf = RandomForestRegressor(
-            n_estimators=50,  # Reduced from 100
-            max_depth=10,  # Limit depth for speed
-            random_state=42, 
-            n_jobs=-1,  # Use all CPU cores
-            min_samples_split=5
-        )
-        rf.fit(X_train_flat, y_train)
-        y_pred_rf = rf.predict(X_test_flat)
-        
-        rmse_rf, mae_rf, r2_rf = calculate_metrics(y_test, y_pred_rf)
-        
-        results['models']['Random Forest'] = {
-            'predictions': y_pred_rf,
-            'rmse': rmse_rf,
-            'mae': mae_rf,
-            'r2': r2_rf,
-            'model': rf
-        }
-        
-        # 3. Train CNN
+        # 2. Train CNN
         status_text.text("🔥 Training CNN model...")
         progress_bar.progress(50)
         
@@ -1382,9 +1353,9 @@ def train_and_compare_models(df, target_col, lookback, epochs, sample_size, ss):
             'model': model_cnn
         }
         
-        # 4. Train CatBoost
+        # 3. Train CatBoost
         status_text.text("🚀 Training CatBoost model...")
-        progress_bar.progress(65)
+        progress_bar.progress(70)
         
         model_catboost, y_pred_catboost = train_catboost_model(
             X_train=X_train, 
@@ -1403,69 +1374,13 @@ def train_and_compare_models(df, target_col, lookback, epochs, sample_size, ss):
             'model': model_catboost
         }
         
-        # 5. Train Random Forest
-        status_text.text("🌲 Training Random Forest...")
-        progress_bar.progress(80)
-        
-        X_train_flat = X_train.reshape(X_train.shape[0], -1)
-        X_test_flat = X_test.reshape(X_test.shape[0], -1)
-        
-        # Faster Random Forest with fewer trees
-        rf = RandomForestRegressor(
-            n_estimators=50,  # Reduced from 100
-            max_depth=10,  # Limit depth for speed
-            random_state=42, 
-            n_jobs=-1,  # Use all CPU cores
-            min_samples_split=5
-        )
-        rf.fit(X_train_flat, y_train)
-        y_pred_rf = rf.predict(X_test_flat)
-        
-        rmse_rf, mae_rf, r2_rf = calculate_metrics(y_test, y_pred_rf)
-        
-        results['models']['Random Forest'] = {
-            'predictions': y_pred_rf,
-            'rmse': rmse_rf,
-            'mae': mae_rf,
-            'r2': r2_rf,
-            'model': rf
-        }
-        
-        # 6. Train SVR (faster with linear kernel and subset)
-        status_text.text("🎯 Training SVR...")
-        progress_bar.progress(90)
-        
-        # Use subset for SVR (it's slow on large datasets)
-        max_svr_samples = 5000
-        if len(X_train_flat) > max_svr_samples:
-            idx = np.random.choice(len(X_train_flat), max_svr_samples, replace=False)
-            X_train_svr = X_train_flat[idx]
-            y_train_svr = y_train[idx]
-        else:
-            X_train_svr = X_train_flat
-            y_train_svr = y_train
-        
-        svr = SVR(kernel='linear', C=1.0)  # Linear kernel is much faster
-        svr.fit(X_train_svr, y_train_svr)
-        y_pred_svr = svr.predict(X_test_flat)
-        
-        rmse_svr, mae_svr, r2_svr = calculate_metrics(y_test, y_pred_svr)
-        
-        results['models']['SVR'] = {
-            'predictions': y_pred_svr,
-            'rmse': rmse_svr,
-            'mae': mae_svr,
-            'r2': r2_svr,
-            'model': svr
-        }
-        
         # Store results
         ss["ai_results"] = results
         
-        status_text.text("✅ All 5 models trained successfully!")
+        status_text.text("✅ All 3 models trained successfully!")
         progress_bar.progress(100)
         
-        st.success("🎉 All models trained successfully!")
+        st.success("🎉 CatBoost, CNN, and LSTM trained successfully!")
         
     except Exception as e:
         st.error(f"Training failed: {e}")
@@ -1503,9 +1418,139 @@ def display_model_results(results, df_source=None):
         st.metric("🏆 Best Model", best_model[0])
         st.metric("Best RMSE", f"{best_model[1]['rmse']:.4f}")
     
+    # Model Comparison Visualization
+    st.divider()
+    st.header("📊 CatBoost vs CNN vs LSTM Comparison")
+    
+    # Create comparison metrics visualization
+    comparison_col1, comparison_col2 = st.columns([1, 1])
+    
+    with comparison_col1:
+        st.markdown("### 📈 Performance Metrics Comparison")
+        
+        # Bar chart for metrics comparison
+        metrics_comparison = []
+        for model_name, model_info in results['models'].items():
+            metrics_comparison.append({
+                'Model': model_name,
+                'RMSE': model_info['rmse'],
+                'MAE': model_info['mae'],
+                'R² Score': model_info['r2']
+            })
+        
+        fig_metrics = go.Figure()
+        
+        models_list = [m['Model'] for m in metrics_comparison]
+        colors_map = {'LSTM': '#3498db', 'CNN': '#e74c3c', 'CatBoost': '#2ecc71'}
+        
+        # RMSE bars
+        fig_metrics.add_trace(go.Bar(
+            name='RMSE (lower is better)',
+            x=models_list,
+            y=[m['RMSE'] for m in metrics_comparison],
+            marker_color=[colors_map.get(m, 'gray') for m in models_list],
+            text=[f"{m['RMSE']:.4f}" for m in metrics_comparison],
+            textposition='auto'
+        ))
+        
+        fig_metrics.update_layout(
+            title="Root Mean Square Error Comparison",
+            yaxis_title="RMSE",
+            xaxis_title="Model",
+            height=400,
+            showlegend=False
+        )
+        
+        st.plotly_chart(fig_metrics, use_container_width=True, key="rmse_comparison")
+        
+        # R² Score comparison
+        fig_r2 = go.Figure()
+        
+        fig_r2.add_trace(go.Bar(
+            name='R² Score (higher is better)',
+            x=models_list,
+            y=[m['R² Score'] for m in metrics_comparison],
+            marker_color=[colors_map.get(m, 'gray') for m in models_list],
+            text=[f"{m['R² Score']:.4f}" for m in metrics_comparison],
+            textposition='auto'
+        ))
+        
+        fig_r2.update_layout(
+            title="R² Score Comparison",
+            yaxis_title="R² Score",
+            xaxis_title="Model",
+            height=400,
+            showlegend=False
+        )
+        
+        st.plotly_chart(fig_r2, use_container_width=True, key="r2_comparison")
+    
+    with comparison_col2:
+        st.markdown("### 🎯 Prediction Accuracy Visualization")
+        
+        # Predictions vs Actual for all 3 models
+        sample_size = min(200, len(y_test))
+        indices = sorted(random.sample(range(len(y_test)), sample_size))
+        
+        fig_pred = go.Figure()
+        
+        # Actual values
+        fig_pred.add_trace(go.Scatter(
+            x=list(range(sample_size)),
+            y=y_test[indices],
+            mode='lines',
+            name='Actual',
+            line=dict(color='black', width=2, dash='solid')
+        ))
+        
+        # Model predictions
+        for model_name, model_info in results['models'].items():
+            fig_pred.add_trace(go.Scatter(
+                x=list(range(sample_size)),
+                y=model_info['predictions'][indices],
+                mode='lines',
+                name=f"{model_name} (RMSE: {model_info['rmse']:.4f})",
+                line=dict(width=2, color=colors_map.get(model_name, 'gray'))
+            ))
+        
+        fig_pred.update_layout(
+            title=f"Model Predictions vs Actual Values ({sample_size} samples)",
+            xaxis_title="Sample Index",
+            yaxis_title="Crop Stress Value",
+            height=400,
+            hovermode='x unified',
+            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+        )
+        
+        st.plotly_chart(fig_pred, use_container_width=True, key="predictions_comparison")
+        
+        # Error distribution
+        st.markdown("### 📊 Prediction Error Distribution")
+        
+        fig_errors = go.Figure()
+        
+        for model_name, model_info in results['models'].items():
+            errors = np.abs(y_test - model_info['predictions'])
+            
+            fig_errors.add_trace(go.Box(
+                y=errors[:500],  # Use subset for clarity
+                name=model_name,
+                marker_color=colors_map.get(model_name, 'gray')
+            ))
+        
+        fig_errors.update_layout(
+            title="Absolute Error Distribution",
+            yaxis_title="Absolute Error",
+            xaxis_title="Model",
+            height=400,
+            showlegend=False
+        )
+        
+        st.plotly_chart(fig_errors, use_container_width=True, key="errors_comparison")
+    
     # Visualizations
     st.divider()
-    st.header("📊 Comprehensive Model Visualizations")
+    st.header("📊 Detailed Model Visualizations")
     
     tabs = st.tabs([
         "📈 Linear Comparison",
@@ -1631,7 +1676,7 @@ def display_model_results(results, df_source=None):
         sample_size = min(300, len(y_test))
         indices = sorted(random.sample(range(len(y_test)), sample_size))
         
-        colors_map = {'LSTM': 'blue', 'CNN': 'red', 'CatBoost': 'green', 'Random Forest': 'orange', 'SVR': 'purple'}
+        colors_map = {'LSTM': 'blue', 'CNN': 'red', 'CatBoost': 'green'}
         
         for model_name, model_info in results['models'].items():
             fig.add_trace(go.Scatter(
